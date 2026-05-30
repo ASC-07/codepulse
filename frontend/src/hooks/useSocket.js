@@ -9,12 +9,15 @@ export function useSocket(userId, onMessage) {
     const token = localStorage.getItem('access_token')
     if (!token) return
 
-    const url = `ws://localhost:8000/ws/${userId}?token=${token}`
+    const wsBase = (import.meta.env.VITE_API_URL || 'http://localhost:8000')
+      .replace('https://', 'wss://')
+      .replace('http://', 'ws://')
+    const url = `${wsBase}/ws/${userId}?token=${token}`
+
     ws.current = new WebSocket(url)
 
     ws.current.onopen = () => {
       console.log('WebSocket connected')
-      // Send ping every 30s to keep alive
       const pingInterval = setInterval(() => {
         if (ws.current?.readyState === WebSocket.OPEN) {
           ws.current.send('ping')
@@ -33,7 +36,6 @@ export function useSocket(userId, onMessage) {
     ws.current.onclose = () => {
       console.log('WebSocket disconnected — reconnecting in 3s')
       clearInterval(ws.current?._pingInterval)
-      // Auto-reconnect
       reconnectTimer.current = setTimeout(connect, 3000)
     }
 
