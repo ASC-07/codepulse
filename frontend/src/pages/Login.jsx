@@ -9,8 +9,9 @@ const features = [
 
 export default function Login() {
   const handleGitHubLogin = () => {
-    window.location.href = 'http://localhost:8000/api/auth/github'
-  }
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  window.location.href = `${apiUrl}/api/auth/github`
+}
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex">
